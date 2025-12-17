@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECR repository for funds-btg backend
+
+Parameters:
+  RepositoryName:
+    Type: String
+    Default: funds-btg
+
+Resources:
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Ref RepositoryName
+
+Outputs:
+  RepositoryUri:
+    Value: !GetAtt EcrRepository.RepositoryUri
+    Export:
+      Name: funds-btg-ecr-uri
