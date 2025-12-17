@@ -1,0 +1,20 @@
+# ===================================================================
+# CONFIGURACIÓN DE DESARROLLO
+# ===================================================================
+
+spring.data.mongodb.uri=mongodb://localhost:27017/btgpactual_funds_dev
+
+# JWT
+jwt.secret=dev-secret-key-change-in-production
+jwt.expiration=86400000
+
+# Email (usar servicio de prueba como Mailtrap)
+spring.mail.host=smtp.mailtrap.io
+spring.mail.port=2525
+spring.mail.username=your-mailtrap-username
+spring.mail.password=your-mailtrap-password
+
+# Logging más detallado en desarrollo
+logging.level.com.btgpactual.fundsbtg=DEBUG
+logging.level.org.springframework.web=DEBUG
+
