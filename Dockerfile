@@ -1,32 +1,19 @@
-FROM openjdk:21-jdk-slim
+# ---- STAGE 1: Build ----
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+WORKDIR /build
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Crear directorio de trabajo
+
+# ---- STAGE 2: Runtime ----
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
-# Instalar curl para health check
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /build/target/*.jar app.jar
 
-# Copiar el JAR generado
-COPY target/funds-btg-1.0.0.jar app.jar
-
-# Crear usuario no-root para ejecutar la aplicación
-RUN addgroup --system spring && adduser --system spring --ingroup spring
+RUN groupadd -r spring && useradd -r -g spring spring
 USER spring:spring
 
-# Exponer el puerto
 EXPOSE 8080
-
-# Configurar JVM para optimizar memoria en contenedor
-ENV JAVA_OPTS="-Xms512m -Xmx1024m \
-    -XX:+UseContainerSupport \
-    -XX:MaxRAMPercentage=75.0 \
-    -XX:+UseG1GC \
-    -XX:+UseStringDeduplication"
-
-# Ejecutar la aplicación
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
-
+ENTRYPOINT ["java", "-jar", "app.jar"]
